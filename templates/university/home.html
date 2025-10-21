@@ -1,0 +1,44 @@
+{% extends 'base.html' %} 
+{% load static %} 
+ 
+{% block title %}University Attendance System{% endblock %} 
+ 
+{% block content %} 
+<div class="jumbotron"> 
+    <h1 class="display-4">Welcome to University Attendance System</h1> 
+    <p class="lead">Efficient attendance management for universities and colleges.</p> 
+    <hr class="my-4"> 
+    <p>Track student attendance, generate reports, and manage courses efficiently.</p> 
+    <a class="btn btn-primary btn-lg" href="/dashboard/" role="button">Go to Dashboard</a> 
+    <a class="btn btn-outline-secondary btn-lg" href="/admin/" role="button">Admin Panel</a> 
+</div> 
+ 
+<div class="row mt-5"> 
+    <div class="col-md-4"> 
+        <div class="card"> 
+            <div class="card-body text-center"> 
+                <i class="fas fa-users fa-3x text-primary mb-3"></i> 
+                <h5 class="card-title">Student Management</h5> 
+                <p class="card-text">Manage student records and information</p> 
+            </div> 
+        </div> 
+    </div> 
+    <div class="col-md-4"> 
+        <div class="card"> 
+            <div class="card-body text-center"> 
+                <i class="fas fa-clipboard-check fa-3x text-success mb-3"></i> 
+                <h5 class="card-title">Attendance Tracking</h5> 
+                <p class="card-text">Mark and monitor student attendance</p> 
+            </div> 
+        </div> 
+    </div> 
+    <div class="col-md-4"> 
+        <div class="card"> 
+            <div class="card-body text-center"> 
+                <i class="fas fa-chart-bar fa-3x text-info mb-3"></i> 
+                <p class="card-text">Generate detailed attendance reports</p> 
+            </div> 
+        </div> 
+    </div> 
+</div> 
+{% endblock %} 

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+    <h2 class="mb-0">Take Attendance</h2>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'bulk_attendance' %}" class="btn btn-outline-primary">
+            <i class="fas fa-users me-1"></i>Bulk Attendance
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card dashboard-card fade-in">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-plus me-2"></i>Mark Individual Attendance
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Student</label>
+                                <select name="student" class="form-select" required>
+                                    <option value="">-- Select Student --</option>
+                                    {% for student in students %}
+                                    <option value="{{ student.id }}">
+                                        {{ student.student_id }} - {{ student.user.get_full_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Class Schedule</label>
+                                <select name="class_schedule" class="form-select" required>
+                                    <option value="">-- Select Class --</option>
+                                    {% for schedule in class_schedules %}
+                                    <option value="{{ schedule.id }}">
+                                        {{ schedule.course.code }} - {{ schedule.get_day_of_week_display }} {{ schedule.start_time|time:"H:i" }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Date</label>
+                                <input type="date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="P">Present</option>
+                                    <option value="A">Absent</option>
+                                    <option value="L">Late</option>
+                                    <option value="E">Excused</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Notes (Optional)</label>
+                                <input type="text" name="notes" class="form-control" placeholder="Additional notes...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save me-2"></i>Save Attendance
+                        </button>
+                        <a href="{% url 'attendance_list' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Display messages -->
+{% if messages %}
+<div class="mt-4">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

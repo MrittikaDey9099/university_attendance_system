@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+    <h2 class="mb-0">Bulk Attendance</h2>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card dashboard-card fade-in">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Mark Attendance for Multiple Students</h5>
+            </div>
+            <div class="card-body">
+                <form id="bulkAttendanceForm" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.class_schedule.label_tag }}
+                                {{ form.class_schedule }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.date.label_tag }}
+                                {{ form.date }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="studentsSection" style="display: none;">
+                        <h6 class="mb-3">Mark Attendance for Students:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="studentsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTableBody">
+                                    <!-- Students will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="markAll('P')">
+                                Mark All Present
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="markAll('A')">
+                                Mark All Absent
+                            </button>
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="markAll('L')">
+                                Mark All Late
+                            </button>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Save Attendance
+                            </button>
+                            <a href="{% url 'attendance_list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentStudents = [];
+
+document.getElementById('id_class_schedule').addEventListener('change', function() {
+    const classScheduleId = this.value;
+    if (classScheduleId) {
+        fetch(`/api/students-by-class/${classScheduleId}/`)
+            .then(response => response.json())
+            .then(data => {
+                currentStudents = data.students;
+                populateStudentsTable(data.students);
+                document.getElementById('studentsSection').style.display = 'block';
+            })
+            .catch(error => console.error('Error:', error));
+    } else {
+        document.getElementById('studentsSection').style.display = 'none';
+    }
+});
+
+function populateStudentsTable(students) {
+    const tbody = document.getElementById('studentsTableBody');
+    tbody.innerHTML = '';
+    
+    students.forEach(student => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${student.student_id}</td>
+            <td>${student.name}</td>
+            <td>${student.department}</td>
+            <td>
+                <select name="student_${student.id}" class="form-select form-select-sm attendance-status">
+                    <option value="P">Present</option>
+                    <option value="A">Absent</option>
+                    <option value="L">Late</option>
+                    <option value="E">Excused</option>
+                </select>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function markAll(status) {
+    document.querySelectorAll('.attendance-status').forEach(select => {
+        select.value = status;
+    });
+}
+
+// Form submission handling
+document.getElementById('bulkAttendanceForm').addEventListener('submit', function(e) {
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<span class="loading"></span> Saving...';
+    submitBtn.disabled = true;
+});
+</script>
+{% endblock %}
