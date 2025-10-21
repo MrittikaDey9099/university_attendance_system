@@ -1,1 +1,2 @@
-"# university_attendance_system" 
+"# University Attendance System" 
+"A comprehensive attendance management system for universities." 
