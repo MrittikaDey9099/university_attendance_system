@@ -1,75 +1,100 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-<head> 
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Attendance List</title> 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> 
-</head> 
-<body> 
-    <div class="container mt-4"> 
-        <h1>Attendance Records</h1> 
-        <div class="card"> 
-            <div class="card-header"> 
-                <h5>Filter Attendance</h5> 
-            </div> 
-            <div class="card-body"> 
-                <form method="get" class="row g-3"> 
-                    <div class="col-md-4"> 
-                        <label class="form-label">Student</label> 
-                        {{ form.student }} 
-                    </div> 
-                    <div class="col-md-4"> 
-                        <label class="form-label">Course</label> 
-                        {{ form.course }} 
-                    </div> 
-                    <div class="col-md-4"> 
-                        <label class="form-label">Date</label> 
-                        {{ form.date }} 
-                    </div> 
-                    <div class="col-12"> 
-                        <button type="submit" class="btn btn-primary">Filter</button> 
-                        <a href="?clear=1" class="btn btn-secondary">Clear</a> 
-                    </div> 
-                </form> 
-            </div> 
-        </div> 
-        <div class="card mt-4"> 
-            <div class="card-body"> 
-                <div class="table-responsive"> 
-                    <table class="table table-striped"> 
-                        <thead> 
-                            <tr> 
-                                <th>Student</th> 
-                                <th>Course</th> 
-                                <th>Date</th> 
-                                <th>Status</th> 
-                            </tr> 
-                        </thead> 
-                        <tbody> 
-                            {% for attendance in attendances %} 
-                            <tr> 
-                                <td>{{ attendance.student.user.get_full_name }}{</td> 
-                                <td>{{ attendance.course.name }}{</td> 
-                                <td>{{ attendance.date }}{</td> 
-                                <td> 
-                                    {% if attendance.status == 'present' %} 
-                                    <span class="badge bg-success">Present</span> 
-                                    {% else %} 
-                                    <span class="badge bg-danger">Absent</span> 
-                                    {% endif %} 
-                                </td> 
-                            </tr> 
-                            {% empty %} 
-                            <tr> 
-                                <td colspan="4" class="text-center">No attendance records found.</td> 
-                            </tr> 
-                            {% endfor %} 
-                        </tbody> 
-                    </table> 
-                </div> 
-            </div> 
-        </div> 
-    </div> 
-</body> 
-</html> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance List - University System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                Attendance List
+            </a>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-funnel me-2"></i>
+                    Filter Attendance Records
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" class="form-control" value="{{ form.start_date.value|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" class="form-control" value="{{ form.end_date.value|default:'' }}">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-filter me-2"></i>Apply Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-list-ul me-2"></i>
+                    Attendance Records
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if attendances %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Course</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Teacher</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attendance in attendances %}
+                            <tr>
+                                <td>{{ attendance.student.user.get_full_name }}</td>
+                                <td>{{ attendance.class_schedule.course.name }}</td>
+                                <td>{{ attendance.date }}</td>
+                                <td>
+                                    <span class="badge {% if attendance.status == 'P' %}bg-success{% elif attendance.status == 'A' %}bg-danger{% else %}bg-warning{% endif %}">
+                                        {{ attendance.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ attendance.class_schedule.teacher.user.get_full_name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-clipboard-x display-1 text-muted"></i>
+                    <h4 class="text-muted mt-3">No Attendance Records Found</h4>
+                    <p class="text-muted">Try adjusting your filters or mark some attendance first.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
