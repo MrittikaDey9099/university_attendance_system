@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Management - University System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: #2e59d9;
+            transform: translateY(-1px);
+        }
+        
+        .stat-card {
+            border-left: 4px solid;
+        }
+        
+        .stat-card.courses {
+            border-left-color: var(--primary-color);
+        }
+        
+        .stat-card.students {
+            border-left-color: var(--success-color);
+        }
+        
+        .course-table th {
+            background-color: #f8f9fc;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        .action-buttons .btn {
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-dark gradient-bg shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="bi bi-mortarboard-fill me-2 fs-3"></i>
+                <span class="fw-bold">University Attendance System</span>
+            </a>
+            <div class="navbar-nav">
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-light">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="h2 fw-bold text-dark mb-2">
+                    <i class="bi bi-journal-bookmark-fill text-primary me-2"></i>
+                    Course Management
+                </h1>
+                <p class="text-muted">Manage all courses and their details in one place</p>
+            </div>
+            <div class="col-auto">
+                <div class="stat-card card border-0 shadow-sm py-2 px-3 me-3">
+                    <div class="card-body py-2">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                                    Total Courses
+                                </div>
+                                <div class="h5 mb-0 fw-bold text-gray-800">{{ courses|length }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-journal-text fs-2 text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Course Card -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card card-hover border-0 shadow">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0 text-primary">
+                            <i class="bi bi-plus-circle-fill me-2"></i>
+                            Add New Course
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'add_course' %}" class="row g-3">
+                            {% csrf_token %}
+                            <div class="col-md-6">
+                                <label for="course_code" class="form-label fw-semibold">
+                                    <i class="bi bi-code-slash me-1"></i>Course Code
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="course_code" 
+                                       name="course_code" placeholder="e.g., CS101" required>
+                                <div class="form-text">Unique identifier for the course</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="course_name" class="form-label fw-semibold">
+                                    <i class="bi bi-journal-text me-1"></i>Course Name
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="course_name" 
+                                       name="course_name" placeholder="e.g., Introduction to Computer Science" required>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Add Course
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary btn-lg px-4 ms-2">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>
+                                    Reset
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses List Card -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-primary">
+                            <i class="bi bi-list-check me-2"></i>
+                            Course Catalog
+                        </h5>
+                        <span class="badge bg-primary fs-6">{{ courses|length }} courses</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if courses %}
+                        <div class="table-responsive">
+                            <table class="table table-hover course-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4">
+                                            <i class="bi bi-hash me-1"></i>Code
+                                        </th>
+                                        <th>
+                                            <i class="bi bi-journal me-1"></i>Course Name
+                                        </th>
+                                        <th class="text-center">
+                                            <i class="bi bi-people me-1"></i>Enrolled
+                                        </th>
+                                        <th class="text-center">
+                                            <i class="bi bi-calendar-check me-1"></i>Last Updated
+                                        </th>
+                                        <th class="text-center">
+                                            <i class="bi bi-gear me-1"></i>Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for course in courses %}
+                                    <tr class="align-middle">
+                                        <td class="ps-4 fw-bold text-primary">
+                                            {{ course.course_code }}
+                                        </td>
+                                        <td class="fw-semibold">{{ course.course_name }}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info fs-6">0 students</span>
+                                        </td>
+                                        <td class="text-center text-muted">
+                                            {% if course.updated_at %}
+                                                {{ course.updated_at|date:"M d, Y" }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center action-buttons">
+                                            <button class="btn btn-sm btn-outline-warning" 
+                                                    data-bs-toggle="tooltip" 
+                                                    title="Edit Course">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-info"
+                                                    data-bs-toggle="tooltip"
+                                                    title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    data-bs-toggle="tooltip"
+                                                    title="Delete Course">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-journal-x display-1 text-muted"></i>
+                            <h4 class="text-muted mt-3">No Courses Found</h4>
+                            <p class="text-muted">Get started by adding your first course above.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body py-3">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <a href="{% url 'dashboard' %}" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'student_management' %}" class="btn btn-outline-success w-100">
+                                    <i class="bi bi-people-fill me-2"></i>Manage Students
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'take_attendance' %}" class="btn btn-outline-info w-100">
+                                    <i class="bi bi-clipboard-check me-2"></i>Take Attendance
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'attendance_report' %}" class="btn btn-outline-warning w-100">
+                                    <i class="bi bi-graph-up me-2"></i>View Reports
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 University Attendance System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Initialize Tooltips -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+    </script>
+</body>
+</html>

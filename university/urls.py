@@ -5,11 +5,11 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     
-    # Attendance URLs
-    path('take-attendance/', views.take_attendance, name='take_attendance'),
-    path('bulk-attendance/', views.bulk_attendance, name='bulk_attendance'),
-    path('attendance-list/', views.attendance_list, name='attendance_list'),
-    path('attendance-report/', views.attendance_report, name='attendance_report'),
+    # Attendance URLs - updated structure
+    path('attendance/take/', views.take_attendance, name='take_attendance'),
+    path('attendance/bulk/', views.bulk_attendance, name='bulk_attendance'),
+    path('attendance/list/', views.attendance_list, name='attendance_list'),
+    path('attendance/report/', views.attendance_report, name='attendance_report'),
     
     # Management URLs
     path('students/', views.student_management, name='student_management'),

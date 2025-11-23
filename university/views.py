@@ -464,3 +464,8 @@ def get_attendance_stats(request):
         })
     
     return JsonResponse({'error': 'Not a student'}, status=400)
+def course_management(request):
+    courses = Course.objects.all()  # Assuming you have a Course model
+    return render(request, 'university/course_management.html', {
+        'courses': courses
+    })
